@@ -71,3 +71,12 @@ puts '-'*80
 # Function application.
 puts App.new(inc,one)
 p inc.applyTo(one)
+
+puts '-'*80
+# Reductions.
+p expr = App.new( App.new(add,one), one )
+i = 0
+while expr.reducible?
+	puts "\nStep #{i+=1}:"
+	p expr = expr.reduce
+end

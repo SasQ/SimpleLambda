@@ -22,6 +22,10 @@ module Lambda module AST
 		def swap(what,to)
 			name == what ? to : self
 		end
+		
+		def reducible?
+			false
+		end
 	end
 	
 	# Anonymous function definition.
@@ -48,6 +52,10 @@ module Lambda module AST
 			puts "let  #{param} = #{what}  in  #{subexpr}"
 			subexpr.swap(param,what)
 		end
+		
+		def reducible?
+			false
+		end
 	end
 	
 	# Function application.
@@ -63,6 +71,20 @@ module Lambda module AST
 		# In function application, we can substitute in both subexpressions.
 		def swap(what,to)
 			App.new( code.swap(what,to), data.swap(what,to) )
+		end
+		
+		def reducible?
+			code.reducible? or data.reducible? or code.is_a?(Fun)
+		end
+		
+		def reduce
+			if code.reducible?
+				App.new( code.reduce, data )
+			elsif data.reducible?
+				App.new( code, data.reduce )
+			else
+				code.applyTo(data)
+			end
 		end
 	end
 	
